@@ -1,6 +1,4 @@
-`timescale 1ns/1ns
-
-`define WORD_SIZE 16
+`include "header.v"
 
 module cpu(clk, reset_n, readM, writeM, address, data, num_inst, output_port, is_halted);
 	input clk;
@@ -17,5 +15,6 @@ module cpu(clk, reset_n, readM, writeM, address, data, num_inst, output_port, is
 	output is_halted;
 
 
-
+	Datapath datapath(clk, reset_n);
+	ControlUnit controlUnit(clk, reset_n, inst);
 endmodule
