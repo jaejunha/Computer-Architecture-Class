@@ -14,7 +14,8 @@ module cpu(clk, reset_n, readM, writeM, address, data, num_inst, output_port, is
 	output [`WORD_SIZE-1:0] output_port;
 	output is_halted;
 
+	wire PVSWriteEn;
 
 	Datapath datapath(clk, reset_n);
-	ControlUnit controlUnit(clk, reset_n, inst);
+	ControlUnit controlUnit(clk, reset_n, inst, PVSWriteEn);
 endmodule
