@@ -1,2 +1,3 @@
 cpu_test.v
 memory.v
+alu.v
