@@ -1,26 +1,18 @@
 `include "header.v"
 
-module ControlUnit(clk, reset_n, inst, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, carry);
+module ControlUnit(clk, reset_n, op, func, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, carry);
 	input clk;
 	input reset_n;
-	input [`WORD_SIZE-1:0] inst;
+	input [`OP_SIZE-1:0] op;
+	input [`FUNC_SIZE-1:0] func;
 
 	output reg PVSWriteEn;
-
-	reg [`OP_SIZE-1:0] op;
-	reg [`FUNC_SIZE-1:0] func;
 
 	output reg [1:0] ALUSrcA, ALUSrcB;
 	output reg [3:0] ALUOp;
 	output reg carry;
 
 	parameter IF = 0, ID = 1, EX = 2, MEM = 3, WB = 4;
-
-	initial
-		begin
-			op = inst[15:12];
-			func = inst[15:12];
-		end
 
 	always @(op or func)
 		begin
