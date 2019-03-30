@@ -6,10 +6,10 @@ module Register(clk, PVSWriteEn, readReg1, readReg2, readData1, readData2, RegWr
 	
 	input [1:0] readReg1, readReg2, writeReg;
 	input RegWrite;
-	input [`WORD_SIZE-1:0] writeData;
-	output reg [`WORD_SIZE-1:0] readData1, readData2;
+	input [`SIZE_WORD - 1:0] writeData;
+	output reg [`SIZE_WORD - 1:0] readData1, readData2;
 
-	reg [`WORD_SIZE-1:0] register[0:`REG_SIZE-1];
+	reg [`SIZE_WORD - 1:0] register[0:`SIZE_REG - 1];
 
 	always @(*) 
 		begin
