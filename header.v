@@ -11,11 +11,12 @@
 
 `define	ALU_ADD		4'b0000
 `define	ALU_SUB		4'b0001
+`define	ALU_LRS		4'b0010
+`define	ALU_ARS		4'b0100
+`define	ALU_ALS		4'b0101
 `define	ALU_NOT		4'b1100
 `define	ALU_AND		4'b1101
 `define	ALU_OR		4'b1110
-`define	ALU_ARS		4'b0100
-`define	ALU_ALS		4'b0101
 
 `define OP_BNE		4'd0
 `define OP_BEQ		4'd1
@@ -30,6 +31,8 @@
 `define OP_JMP		4'd9
 `define OP_JAL		4'd10
 
+`define FUNC_SHL	6'd6
+`define FUNC_SHR	6'd7
 `define FUNC_JPR	6'd25
 `define FUNC_JRL	6'd26
 `define FUNC_WWD	6'd28

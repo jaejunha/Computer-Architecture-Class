@@ -1,6 +1,6 @@
 `include "header.v"
 
-module ControlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, MemRead, MemWrite, RegWrite, MemDest, RegDest, Bcond, ALUSrcA, ALUSrcB, ALUOp, carry);
+module ControlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, MemToReg, MemRead, MemWrite, RegWrite, MemDest, RegDest, JumpDest, Bcond, ALUSrcA, ALUSrcB, ALUOp, carry);
 	input clk;
 	input [`SIZE_WORD - 1:0] inst;
 
@@ -11,8 +11,10 @@ module ControlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, MemRead, MemWr
 
 	output reg PVSWriteEn;
 	output reg jump, branch, WWD, HLT;
+	output reg [1:0] MemToReg;
 	output reg MemRead, MemWrite, RegWrite, MemDest; 
 	output reg [1:0] RegDest;
+	output reg JumpDest;
 	output reg [1:0] Bcond;
 	output reg [1:0] ALUSrcA, ALUSrcB;
 	output reg [3:0] ALUOp;
@@ -88,7 +90,7 @@ module ControlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, MemRead, MemWr
 				state_next <= `STATE_ID;
 			end
 			`STATE_ID: begin
-				if((op == `OP_R && jump == 0 && WWD == 0) || (op == `OP_ADI || op == `OP_ORI || op == `OP_LHI) || (op == `OP_LWD || op == `OP_SWD)) begin
+				if(op == `OP_R || op == `OP_ADI || op == `OP_ORI || op == `OP_LHI || op == `OP_LWD || op == `OP_SWD) begin
 					PVSWriteEn <= 0;
 					MemRead <= 0;
 					MemWrite <= 0;
@@ -112,14 +114,106 @@ module ControlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, MemRead, MemWr
 					RegWrite <= 0;
 					state_next <= `STATE_IF;
 				end
+				if(jump == 1) begin
+					PVSWriteEn <= 1;
+					if(op == `OP_JAL || op == `OP_JMP)
+						JumpDest <= 0;
+					else
+						JumpDest <= 1;
+					MemRead <= 0;
+					MemWrite <= 0;
+					MemToReg <= 2;
+					if(op == `OP_JAL || func == `FUNC_JRL)
+						RegWrite <= 1;
+					else
+						RegWrite <= 0;
+					RegDest <= 2;
+					state_next <= `STATE_IF;
+				end
+				if(HLT == 1) begin
+					PVSWriteEn <= 1;
+					MemRead <= 0;
+					MemWrite <= 0;
+					RegWrite <= 0;
+					state_next <= `STATE_IF;
+				end
 			end
 			`STATE_EX: begin
 				PVSWriteEn <= 0;
+				MemRead <= 0;
+				MemWrite <= 0;
+				RegWrite <= 0;
+				if(op == `OP_R) begin
+					ALUSrcA <= 0;
+					case(func)
+						`FUNC_SHL: ALUSrcB <= 3;
+						`FUNC_SHR: ALUSrcB <= 3;
+						default: ALUSrcB <= 0;
+					endcase
+					state_next <= `STATE_WB;
+				end
+				if(op == `OP_ADI || op == `OP_ORI || op == `OP_LHI) begin
+					if(op == `OP_ADI || op == `OP_ORI) begin
+						ALUSrcA <= 0;
+						ALUSrcB <= 1;
+					end
+					else begin
+						ALUSrcA <= 1;
+						ALUSrcB <= 2;
+					end
+					case(op)
+						`OP_ADI: ALUOp <= `ALU_ADD;
+						`OP_ORI: ALUOp <= `ALU_OR;
+						`OP_LHI: ALUOp <= `ALU_LRS;
+					endcase
+					carry <= 0;
+					state_next <= `STATE_WB;
+				end
+				if(op == `OP_LWD || op == `OP_SWD) begin
+					ALUSrcA <= 0;
+					ALUSrcB <= 1;
+					ALUOp <= `ALU_ADD;
+					carry <= 0;
+					state_next <= `STATE_MEM;
+				end	
 			end
 			`STATE_MEM: begin
+				MemDest <= 1;
+				RegWrite <= 0;
+				case(op)
+					`OP_LWD: begin
+						PVSWriteEn <= 0;
+						MemRead <= 1;
+						MemWrite <= 0;
+						state_next <= `STATE_WB;
+					end
+					`OP_SWD: begin
+						PVSWriteEn <= 1;
+						MemRead <= 0;
+						MemWrite <= 1;
+						state_next <= `STATE_IF;
+					end
+				endcase
 			end
 			`STATE_WB: begin
 				PVSWriteEn <= 1;
+				MemRead <= 0;
+				MemWrite <= 0;
+				if(op == `OP_R) begin
+					MemToReg <= 1;
+					RegWrite <= 1;
+					RegDest <= 1;
+				end
+				if(op == `OP_ADI || op == `OP_ORI || op == `OP_LHI) begin
+					MemToReg <= 1;
+					RegWrite <= 1;
+					RegDest <= 0;
+				end
+				if(op == `OP_LWD) begin
+					MemToReg <= 0;
+					RegWrite <= 1;
+					RegDest <= 0;
+				end
 				state_next <= `STATE_IF;
 			end
 		endcase
