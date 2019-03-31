@@ -17,13 +17,15 @@ module cpu(clk, reset_n, readM, writeM, address, data, num_inst, output_port, is
 	wire PVSWriteEn;
 
 	wire jump, branch, WWD, HLT;
-
+	wire MemRead, MemWrite, RegWrite, MemDest; 
+	wire [1:0] RegDest;
+	wire [1:0] Bcond;
 	wire [1:0] ALUSrcA, ALUSrcB;
 	wire [3:0] ALUOp;
 	wire carry;
 
 	wire [`SIZE_WORD - 1:0] inst;
 
-	Datapath datapath(clk, reset_n, data, inst, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, carry);
-	ControlUnit controlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, ALUSrcA, ALUSrcB, ALUOp, carry);
+	Datapath datapath(clk, data, inst, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, carry);
+	ControlUnit controlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, MemRead, MemWrite, RegWrite, MemDest, RegDest, Bcond, ALUSrcA, ALUSrcB, ALUOp, carry);
 endmodule

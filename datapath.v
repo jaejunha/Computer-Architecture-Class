@@ -1,8 +1,7 @@
 `include "header.v"
 
-module Datapath(clk, reset_n, data, inst, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, carry);
+module Datapath(clk, data, inst, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, carry);
 	input clk;
-	input reset_n;
 
 	inout [`SIZE_WORD - 1:0] data;
 
@@ -13,5 +12,11 @@ module Datapath(clk, reset_n, data, inst, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, c
 	input [1:0] ALUSrcA, ALUSrcB;
 	input [3:0] ALUOp;
 	input carry;
+
+	reg [`SIZE_WORD - 1:0] instruction;
+	reg [`SIZE_WORD - 1:0] instruction_next;
+
+	reg [`SIZE_WORD - 1:0] pc;
+	reg [`SIZE_WORD - 1:0] pc_next;
 
 endmodule
