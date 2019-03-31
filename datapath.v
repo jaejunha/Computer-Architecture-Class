@@ -1,6 +1,6 @@
 `include "header.v"
 
-module Datapath(clk, data, inst, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, carry, num_inst, output_port, is_halted);
+module Datapath(clk, data, inst, PVSWriteEn, jump, branch, WWD, HLT, MemToReg, MemRead, MemWrite, RegWrite, MemDest, RegDest, JumpDest, Bcond, ALUSrcA, ALUSrcB, ALUOp, carry, num_inst, output_port, is_halted);
 	input clk;
 
 	inout [`SIZE_WORD - 1:0] data;
@@ -9,6 +9,12 @@ module Datapath(clk, data, inst, PVSWriteEn, ALUSrcA, ALUSrcB, ALUOp, carry, num
 	assign data = inst;
 
 	input PVSWriteEn;
+	input jump, branch, WWD, HLT;
+	input [1:0] MemToReg;
+	input MemRead, MemWrite, RegWrite, MemDest; 
+	input [1:0] RegDest;
+	input JumpDest;
+	input [1:0] Bcond;
 	input [1:0] ALUSrcA, ALUSrcB;
 	input [3:0] ALUOp;
 	input carry;
