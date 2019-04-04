@@ -18,16 +18,16 @@ module cpu(clk, reset_n, readM, writeM, address, data, num_inst, output_port, is
 
 	wire jump, branch, WWD, HLT;
 	wire [1:0] MemToReg;
-	wire MemRead, MemWrite, RegWrite, MemDest; 
-	wire [1:0] RegDest;
-	wire JumpDest;
+	wire MemRead, MemWrite, RegWrite, MemDst; 
+	wire [1:0] RegDst;
+	wire JumpDst;
 	wire [1:0] Bcond;
-	wire [1:0] ALUSrcA, ALUSrcB;
+	wire ALUSrcA;
+	wire [1:0] ALUSrcB;
 	wire [3:0] ALUOp;
-	wire carry;
 
 	wire [`SIZE_WORD - 1:0] inst;
 
-	Datapath datapath(clk, data, inst, PVSWriteEn, jump, branch, WWD, HLT, MemToReg, MemRead, MemWrite, RegWrite, MemDest, RegDest, JumpDest, Bcond, ALUSrcA, ALUSrcB, ALUOp, carry, num_inst, output_port, is_halted);
-	ControlUnit controlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, MemToReg, MemRead, MemWrite, RegWrite, MemDest, RegDest, JumpDest, Bcond, ALUSrcA, ALUSrcB, ALUOp, carry);
+	Datapath datapath(clk, data, inst, address, readM, writeM, PVSWriteEn, jump, branch, WWD, HLT, MemToReg, MemRead, MemWrite, RegWrite, MemDst, RegDst, JumpDst, Bcond, ALUSrcA, ALUSrcB, ALUOp, num_inst, output_port, is_halted);
+	ControlUnit controlUnit(clk, inst, PVSWriteEn, jump, branch, WWD, HLT, MemToReg, MemRead, MemWrite, RegWrite, MemDst, RegDst, JumpDst, Bcond, ALUSrcA, ALUSrcB, ALUOp);
 endmodule

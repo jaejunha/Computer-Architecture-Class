@@ -11,16 +11,14 @@ module Register(clk, PVSWriteEn, readReg1, readReg2, readData1, readData2, RegWr
 
 	reg [`SIZE_WORD - 1:0] register[0:`SIZE_REG - 1];
 
-	always @(*) 
-		begin
-			readData1 <= register[readReg1];
-			readData2 <= register[readReg2];
-		end
+	always @(*) begin
+		readData1 <= register[readReg1];
+		readData2 <= register[readReg2];
+	end
 
-	always @(posedge clk)
-		begin
-			if(PVSWriteEn == 1 && RegWrite == 1)
-				register[writeReg] <= writeData;
-		end
+	always @(posedge clk) begin
+		if(PVSWriteEn == 1 && RegWrite == 1)
+			register[writeReg] <= writeData;
+	end
 
 endmodule
